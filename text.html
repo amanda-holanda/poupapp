@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PoupApp - Minhas Despesas</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+
+    .topbar {
+      background-color: #2E86AB;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+    }
+
+    .topbar .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background-color: white;
+      padding: 6px 16px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .topbar .logo-icon {
+      font-size: 28px;
+      background: #2E86AB;
+      color: white;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: inset 0 0 4px rgba(255,255,255,0.3);
+    }
+
+    .topbar .logo-text {
+      font-size: 20px;
+      font-weight: 600;
+      display: flex;
+    }
+
+    .topbar .logo-text span:first-child {
+      color: #2E86AB;
+    }
+
+    .topbar .logo-text span:last-child {
+      color: #27AE60;
+    }
+
+    .topbar .menu {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .topbar a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #2E86AB;
+    }
+
+    .filters,
+    .form {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    input,
+    select,
+    button {
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    button {
+      background-color: #2E86AB;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th,
+    td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background-color: #2E86AB;
+      color: white;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .actions i {
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar">
+    <div class="logo">
+      <div class="logo-icon">🐖</div>
+      <div class="logo-text"><span>Poup</span><span>App</span></div>
+    </div>
+    <div class="menu">
+      <a href="#">Início</a>
+      <a href="#">Despesas</a>
+      <a href="#" style="margin-left: auto;"><img src="https://cdn-icons-png.flaticon.com/512/1828/1828479.png" alt="Sair" style="width: 20px; vertical-align: middle;"> Sair</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <h2>Minhas Despesas</h2>
+
+    <div class="filters">
+      <label>Filtrar Categoria:
+        <select>
+          <option>Todos</option>
+        </select>
+      </label>
+      <label>Filtrar Valor:
+        <input type="text" placeholder="Ordenar por valor">
+      </label>
+    </div>
+
+    <div class="form">
+      <input type="text" placeholder="Descrição">
+      <input type="number" placeholder="Valor">
+      <select>
+        <option>Outros</option>
+      </select>
+      <input type="date">
+      <button>Cadastrar</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Descrição</th>
+          <th>Valor</th>
+          <th>Categoria</th>
+          <th>Data</th>
+          <th>Ação</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Reforma</td>
+          <td>R$ 325,00</td>
+          <td>Utilidades Domésticas</td>
+          <td>21/08/2023</td>
+          <td class="actions">✏️ 🗑️</td>
+        </tr>
+        <tr>
+          <td>Mercado</td>
+          <td>R$ 300,00</td>
+          <td>Alimentação</td>
+          <td>08/05/2023</td>
+          <td class="actions">✏️ 🗑️</td>
+        </tr>
+        <tr>
+          <td>Pediatra</td>
+          <td>R$ 300,00</td>
+          <td>Saúde</td>
+          <td>06/09/2023</td>
+          <td class="actions">✏️ 🗑️</td>
+        </tr>
+        <tr>
+          <td>Faculdade</td>
+          <td>R$ 229,00</td>
+          <td>Educação</td>
+          <td>10/08/2023</td>
+          <td class="actions">✏️ 🗑️</td>
+        </tr>
+        <tr>
+          <td>Cinema</td>
+          <td>R$ 100,00</td>
+          <td>Lazer</td>
+          <td>30/09/2023</td>
+          <td class="actions">✏️ 🗑️</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+
+</html>
