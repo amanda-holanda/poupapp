@@ -1,0 +1,31 @@
+.form {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  
+  .form input,
+  .form select {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-family: 'Poppins', sans-serif;
+    min-width: 150px;
+  }
+  
+  .form button {
+    padding: 10px 20px;
+    background-color: #2E86AB;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    transition: background-color 0.2s;
+  }
+  
+  .form button:hover {
+    background-color: #1f6a8a;
+  }

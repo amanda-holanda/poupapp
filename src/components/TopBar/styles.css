@@ -1,0 +1,57 @@
+.topbar {
+    background-color: #2E86AB;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+  }
+  
+  .topbar .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: white;
+    padding: 6px 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  }
+  
+  .topbar .logo-icon {
+    font-size: 28px;
+    background: #2E86AB;
+    color: white;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 0 0 4px rgba(255,255,255,0.3);
+  }
+  
+  .topbar .logo-text {
+    font-size: 20px;
+    font-weight: 600;
+    display: flex;
+  }
+  
+  .topbar .logo-text span:first-child {
+    color: #2E86AB;
+  }
+  
+  .topbar .logo-text span:last-child {
+    color: #27AE60;
+  }
+  
+  .topbar .menu {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .topbar a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+  }
