@@ -1,25 +1,37 @@
 import { useState } from 'react';
 import './styles.css';
 
-const ExpenseForm = ({ onAddExpense }) => {
+const ExpenseForm = ({ onAddExpense, categories }) => {
   const [description, setDescription] = useState('');
   const [value, setValue] = useState('');
-  const [category, setCategory] = useState('Outros');
+  const [category, setCategory] = useState('Selecione uma opção');
   const [date, setDate] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Validação básica
+    if (category === 'Selecione uma opção') {
+      alert('Por favor, selecione uma categoria válida');
+      return;
+    }
+
+    const formattedValue = parseFloat(value).toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+
     const newExpense = {
       description,
-      value,
+      value: formattedValue,
       category,
-      date
+      date: date || new Date().toISOString().split('T')[0]
     };
+    
     onAddExpense(newExpense);
-    // Limpar formulário
+    // Limpa o formulário mas mantém a categoria selecionada
     setDescription('');
     setValue('');
-    setCategory('Selecione uma opção');
     setDate('');
   };
 
@@ -32,52 +44,35 @@ const ExpenseForm = ({ onAddExpense }) => {
         onChange={(e) => setDescription(e.target.value)}
         required
       />
+      
       <input
         type="number"
-        placeholder="Valor"
+        placeholder="Valor (ex: 50.99)"
         value={value}
         onChange={(e) => setValue(e.target.value)}
+        step="0.01"
+        min="0"
         required
       />
+      
       <select
         value={category}
         onChange={(e) => setCategory(e.target.value)}
+        required
       >
-        <option>Selecione uma opção</option>
-        <option>Aluguel/hipoteca</option>
-        <option>Condomínio</option>
-        <option>Contas de água, luz, gás</option>
-        <option>Internet/telefone</option>
-        <option>Plano de saúde</option>
-        <option>Seguros</option>
-        <option>Mensalidades escolares/faculdade</option>
-        <option>Transporte público/combustível</option>
-        <option>Financiamentos</option>
-        <option>Impostos</option>
-        <option>Supermercado/alimentação</option>
-        <option>Farmácia/medicamentos</option>
-        <option>Vestuário/calçados</option>
-        <option>Manutenção de casa/carro</option>
-        <option>Educação</option>
-        <option>Cuidados pessoais</option>
-        <option>Lazer/entretenimento</option>
-        <option>Viagens</option>
-        <option>Restaurantes/bares</option>
-        <option>Assinaturas</option>
-        <option>Compras por impulso</option>
-        <option>Presentes/doações</option>
-        <option>Hobbies/esportes</option>
-        <option>Reparos domésticos</option>
-        <option>Gastos médicos inesperados</option>
-        <option>Multas</option>
-        <option>Outros</option>
+        <option disabled value="Selecione uma opção">Selecione uma opção</option>
+        {categories.map((cat) => (
+          <option key={cat} value={cat}>{cat}</option>
+        ))}
       </select>
+      
       <input
         type="date"
         value={date}
         onChange={(e) => setDate(e.target.value)}
-        required
+        max={new Date().toISOString().split('T')[0]}
       />
+      
       <button type="submit">Cadastrar</button>
     </form>
   );
