@@ -49,6 +49,12 @@ const App = () => {
   // Estado dos filtros
   const [categoryFilter, setCategoryFilter] = useState('Todos');
   const [sortOrder, setSortOrder] = useState('');
+  const [dateFilter, setDateFilter] = useState('');
+
+  // Função para lidar com filtro por data única
+  const handleDateFilterChange = (date) => {
+    setDateFilter(date);
+  };
 
   // Filtra e ordena as despesas
   const filteredExpenses = useMemo(() => {
@@ -57,6 +63,14 @@ const App = () => {
     // Filtro por categoria
     if (categoryFilter !== 'Todos') {
       result = result.filter(exp => exp.category === categoryFilter);
+    }
+
+    // Filtro por data única
+    if (dateFilter) {
+      result = result.filter(exp => {
+        const expenseDate = exp.date.split('/').reverse().join('-');
+        return expenseDate === dateFilter;
+      });
     }
     
     // Ordenação por valor
@@ -69,7 +83,7 @@ const App = () => {
     }
     
     return result;
-  }, [expenses, categoryFilter, sortOrder]);
+  }, [expenses, categoryFilter, sortOrder, dateFilter]);
 
   // Adiciona nova despesa
   const handleAddExpense = (newExpense) => {
@@ -99,6 +113,7 @@ const App = () => {
   const handleClearFilters = () => {
     setCategoryFilter('Todos');
     setSortOrder('');
+    setDateFilter('');
   };
 
   return (
@@ -112,6 +127,7 @@ const App = () => {
           onCategoryChange={setCategoryFilter}
           onSortValue={setSortOrder}
           onClearFilters={handleClearFilters}
+          onDateFilterChange={handleDateFilterChange} 
         />
         
         <ExpenseForm 
