@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState } from 'react'; 
 import './styles.css';
 
-const Filters = ({ categories, onCategoryChange, onSortValue }) => {
+const Filters = ({ categories, onCategoryChange, onSortValue, onClearFilters }) => {
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [sortValue, setSortValue] = useState('');
 
@@ -17,6 +17,12 @@ const Filters = ({ categories, onCategoryChange, onSortValue }) => {
     onSortValue(value);
   };
 
+  const handleClearFilters = () => {
+    setSelectedCategory('Todos');
+    setSortValue('');
+    onClearFilters();
+  };
+
   return (
     <div className="filters">
       <label>
@@ -29,6 +35,7 @@ const Filters = ({ categories, onCategoryChange, onSortValue }) => {
           ))}
         </select>
       </label>
+      
       <label>
         Ordenar por Valor:
         <select value={sortValue} onChange={handleSortChange}>
@@ -37,6 +44,15 @@ const Filters = ({ categories, onCategoryChange, onSortValue }) => {
           <option value="desc">Maior para Menor</option>
         </select>
       </label>
+      
+      <button 
+        type="button" 
+        className="clear-filters"
+        onClick={handleClearFilters}
+        disabled={selectedCategory === 'Todos' && sortValue === ''}
+      >
+        Limpar Filtros
+      </button>
     </div>
   );
 };

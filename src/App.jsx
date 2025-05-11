@@ -96,6 +96,11 @@ const App = () => {
     }
   };
 
+  const handleClearFilters = () => {
+    setCategoryFilter('Todos');
+    setSortOrder('');
+  };
+
   return (
     <div>
       <TopBar />
@@ -106,6 +111,7 @@ const App = () => {
           categories={['Todos', ...categories]}
           onCategoryChange={setCategoryFilter}
           onSortValue={setSortOrder}
+          onClearFilters={handleClearFilters}
         />
         
         <ExpenseForm 
