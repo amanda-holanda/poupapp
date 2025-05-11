@@ -51,6 +51,14 @@ const App = () => {
   const [sortOrder, setSortOrder] = useState('');
   const [dateFilter, setDateFilter] = useState('');
 
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    description: '',
+    value: '',
+    category: '',
+    date: ''
+  });
+
   // Função para lidar com filtro por data única
   const handleDateFilterChange = (date) => {
     setDateFilter(date);
@@ -59,7 +67,7 @@ const App = () => {
   // Filtra e ordena as despesas
   const filteredExpenses = useMemo(() => {
     let result = [...expenses];
-    
+
     // Filtro por categoria
     if (categoryFilter !== 'Todos') {
       result = result.filter(exp => exp.category === categoryFilter);
@@ -72,7 +80,7 @@ const App = () => {
         return expenseDate === dateFilter;
       });
     }
-    
+
     // Ordenação por valor
     if (sortOrder) {
       result.sort((a, b) => {
@@ -81,7 +89,7 @@ const App = () => {
         return sortOrder === 'asc' ? valA - valB : valB - valA;
       });
     }
-    
+
     return result;
   }, [expenses, categoryFilter, sortOrder, dateFilter]);
 
@@ -98,16 +106,48 @@ const App = () => {
 
   // Edita despesa (implementação básica)
   const handleEditExpense = (index) => {
-    // Implementação básica - pode ser expandida
     const expenseToEdit = expenses[index];
-    if (window.confirm(`Editar despesa: ${expenseToEdit.description}?`)) {
-      const newDescription = prompt('Nova descrição:', expenseToEdit.description);
-      if (newDescription) {
-        const updatedExpenses = [...expenses];
-        updatedExpenses[index].description = newDescription;
-        setExpenses(updatedExpenses);
-      }
+    setEditingIndex(index);
+    setEditFormData({
+      description: expenseToEdit.description,
+      value: expenseToEdit.value.replace(',', '.'),
+      category: expenseToEdit.category,
+      date: expenseToEdit.date.split('/').reverse().join('-')
+    });
+  };
+
+  const handleUpdateExpense = () => {
+    if (editingIndex !== null) {
+      const updatedExpenses = [...expenses];
+      updatedExpenses[editingIndex] = {
+        description: editFormData.description,
+        value: parseFloat(editFormData.value).toLocaleString('pt-BR', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }),
+        category: editFormData.category,
+        date: editFormData.date.split('-').reverse().join('/')
+      };
+
+      setExpenses(updatedExpenses);
+      setEditingIndex(null);
+      setEditFormData({
+        description: '',
+        value: '',
+        category: '',
+        date: ''
+      });
     }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingIndex(null);
+    setEditFormData({
+      description: '',
+      value: '',
+      category: '',
+      date: ''
+    });
   };
 
   const handleClearFilters = () => {
@@ -121,25 +161,63 @@ const App = () => {
       <TopBar />
       <div className="container">
         <h2>Minhas Despesas</h2>
-        
-        <Filters 
+
+        <Filters
           categories={['Todos', ...categories]}
           onCategoryChange={setCategoryFilter}
           onSortValue={setSortOrder}
           onClearFilters={handleClearFilters}
-          onDateFilterChange={handleDateFilterChange} 
+          onDateFilterChange={handleDateFilterChange}
         />
-        
-        <ExpenseForm 
+
+        <ExpenseForm
           onAddExpense={handleAddExpense}
           categories={categories}
         />
-        
-        <ExpenseTable 
-          expenses={filteredExpenses} 
-          onDelete={handleDeleteExpense}
-          onEdit={handleEditExpense}
-        />
+
+        {editingIndex !== null ? (
+          <div className="edit-form-container">
+            <h3>Editar Despesa</h3>
+            <div className="edit-form">
+              <input
+                type="text"
+                value={editFormData.description}
+                onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                placeholder="Descrição"
+              />
+              <input
+                type="number"
+                value={editFormData.value}
+                onChange={(e) => setEditFormData({ ...editFormData, value: e.target.value })}
+                placeholder="Valor"
+                step="0.01"
+              />
+              <select
+                value={editFormData.category}
+                onChange={(e) => setEditFormData({ ...editFormData, category: e.target.value })}
+              >
+                {categories.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+              <input
+                type="date"
+                value={editFormData.date}
+                onChange={(e) => setEditFormData({ ...editFormData, date: e.target.value })}
+              />
+              <div className="edit-buttons">
+                <button onClick={handleUpdateExpense}>Salvar</button>
+                <button onClick={handleCancelEdit}>Cancelar</button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <ExpenseTable
+            expenses={filteredExpenses}
+            onDelete={handleDeleteExpense}
+            onEdit={handleEditExpense}
+          />
+        )}
       </div>
     </div>
   );
