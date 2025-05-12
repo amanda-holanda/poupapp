@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import TopBar from './components/TopBar';
 import Filters from './components/Filters';
 import ExpenseForm from './components/ExpenseForm';
@@ -37,14 +37,22 @@ const App = () => {
     'Viagens'
   ]);
 
-  // Estado das despesas
-  const [expenses, setExpenses] = useState([
-    { description: 'Reforma', value: '325,00', category: 'Utilidades Domésticas', date: '21/08/2023' },
-    { description: 'Mercado', value: '300,00', category: 'Alimentação', date: '08/05/2023' },
-    { description: 'Pediatra', value: '300,00', category: 'Saúde', date: '06/09/2023' },
-    { description: 'Faculdade', value: '229,00', category: 'Educação', date: '10/08/2023' },
-    { description: 'Cinema', value: '100,00', category: 'Lazer', date: '30/09/2023' }
-  ]);
+  // Estado inicial carregando do localStorage
+  const [expenses, setExpenses] = useState(() => {
+    const savedExpenses = localStorage.getItem('poupapp-expenses');
+    return savedExpenses ? JSON.parse(savedExpenses) : [
+      { description: 'Reforma', value: '325,00', category: 'Utilidades Domésticas', date: '21/08/2023' },
+      { description: 'Mercado', value: '300,00', category: 'Alimentação', date: '08/05/2023' },
+      { description: 'Pediatra', value: '300,00', category: 'Saúde', date: '06/09/2023' },
+      { description: 'Faculdade', value: '229,00', category: 'Educação', date: '10/08/2023' },
+      { description: 'Cinema', value: '100,00', category: 'Lazer', date: '30/09/2023' }
+    ];
+  });
+
+  // Salva no localStorage sempre que expenses mudar
+  useEffect(() => {
+    localStorage.setItem('poupapp-expenses', JSON.stringify(expenses));
+  }, [expenses]);
 
   // Estado dos filtros
   const [categoryFilter, setCategoryFilter] = useState('Todos');
@@ -95,13 +103,11 @@ const App = () => {
 
   // Adiciona nova despesa
   const handleAddExpense = (newExpense) => {
-    setExpenses([...expenses, newExpense]);
+    setExpenses(prevExpenses => [...prevExpenses, newExpense]);
   };
 
-  // Remove despesa
   const handleDeleteExpense = (index) => {
-    const newExpenses = expenses.filter((_, i) => i !== index);
-    setExpenses(newExpenses);
+    setExpenses(prevExpenses => prevExpenses.filter((_, i) => i !== index));
   };
 
   // Edita despesa (implementação básica)
@@ -117,9 +123,10 @@ const App = () => {
   };
 
   const handleUpdateExpense = () => {
-    if (editingIndex !== null) {
-      const updatedExpenses = [...expenses];
-      updatedExpenses[editingIndex] = {
+  if (editingIndex !== null) {
+    setExpenses(prevExpenses => {
+      const updated = [...prevExpenses];
+      updated[editingIndex] = {
         description: editFormData.description,
         value: parseFloat(editFormData.value).toLocaleString('pt-BR', {
           minimumFractionDigits: 2,
@@ -128,17 +135,11 @@ const App = () => {
         category: editFormData.category,
         date: editFormData.date.split('-').reverse().join('/')
       };
-
-      setExpenses(updatedExpenses);
-      setEditingIndex(null);
-      setEditFormData({
-        description: '',
-        value: '',
-        category: '',
-        date: ''
-      });
-    }
-  };
+      return updated;
+    });
+    setEditingIndex(null);
+  }
+};
 
   const handleCancelEdit = () => {
     setEditingIndex(null);
