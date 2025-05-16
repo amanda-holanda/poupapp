@@ -1,0 +1,22 @@
+.total-despesas-container {
+  margin: 40px auto;
+  padding: 20px;
+  max-width: 400px;
+  background-color: #e6f7ff;
+  border: 2px solid #1890ff;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.total-despesas-container h2 {
+  margin: 0 0 10px;
+  font-size: 24px;
+  color: #0050b3;
+}
+
+.total-valor {
+  font-size: 32px;
+  font-weight: bold;
+  color: #1890ff;
+}

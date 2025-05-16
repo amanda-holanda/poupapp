@@ -3,6 +3,10 @@ import TopBar from './components/TopBar';
 import Filters from './components/Filters';
 import ExpenseForm from './components/ExpenseForm';
 import ExpenseTable from './components/ExpenseTable';
+import TotalDespesas from './components/TotalDespesas';
+
+
+
 import './App.css';
 
 const App = () => {
@@ -219,6 +223,7 @@ const App = () => {
             onEdit={handleEditExpense}
           />
         )}
+        <TotalDespesas expenses={filteredExpenses} />
       </div>
     </div>
   );
