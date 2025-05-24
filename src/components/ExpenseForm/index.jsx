@@ -35,6 +35,11 @@ const ExpenseForm = ({ onAddExpense, categories }) => {
     setDate('');
   };
 
+  const today = new Date();
+  const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+    .toISOString()
+    .split('T')[0];
+
   return (
     <form className="form" onSubmit={handleSubmit}>
       <input
@@ -47,7 +52,7 @@ const ExpenseForm = ({ onAddExpense, categories }) => {
       
       <input
         type="number"
-        placeholder="Valor (ex: 50.99)"
+        placeholder="R$ 999,99"
         value={value}
         onChange={(e) => setValue(e.target.value)}
         step="0.01"
@@ -62,7 +67,7 @@ const ExpenseForm = ({ onAddExpense, categories }) => {
       >
         <option disabled value="Selecione uma opção">Selecione uma opção</option>
         {categories.map((cat) => (
-          <option key={cat} value={cat}>{cat}</option>
+          <option key={cat.id} value={cat.id}>{cat.title}</option>
         ))}
       </select>
       
@@ -70,7 +75,7 @@ const ExpenseForm = ({ onAddExpense, categories }) => {
         type="date"
         value={date}
         onChange={(e) => setDate(e.target.value)}
-        max={new Date().toISOString().split('T')[0]}
+        max={lastDayOfMonth}
       />
       
       <button type="submit">Cadastrar</button>

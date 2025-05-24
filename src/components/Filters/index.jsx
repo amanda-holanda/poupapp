@@ -25,6 +25,11 @@ const Filters = ({
     onDateFilterChange(date);
   };
 
+  const today = new Date();
+  const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+    .toISOString()
+    .split('T')[0];
+
   return (
     <div className="filters">
       {/* Filtro de Categoria */}
@@ -32,13 +37,15 @@ const Filters = ({
         Filtrar Categoria:
         <select 
           value={selectedCategory} 
-          onChange={(e) => {
+          onChange={e => {
+            console.log(`Cat: ${e.target.value}`);
+            
             setSelectedCategory(e.target.value);
             onCategoryChange(e.target.value);
           }}
         >
-          {categories.map((category) => (
-            <option key={category} value={category}>{category}</option>
+          {categories.map(category => (
+            <option key={category.id} value={category.id}>{category.title}</option>
           ))}
         </select>
       </label>
@@ -50,7 +57,7 @@ const Filters = ({
           type="date" 
           value={filterDate}
           onChange={handleDateChange}
-          max={new Date().toISOString().split('T')[0]}
+          max={lastDayOfMonth}
         />
       </label>
 

@@ -1,8 +1,8 @@
 import './style.css';
 
 const TotalDespesas = ({ expenses }) => {
-  const total = expenses.reduce((acc, curr) => {
-    const valor = parseFloat(curr.value.replace(',', '.'));
+    const total = expenses.reduce((acc, curr) => {
+    const valor = parseFloat(curr.valor);
     return acc + (isNaN(valor) ? 0 : valor);
   }, 0);
 

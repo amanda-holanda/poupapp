@@ -1,6 +1,5 @@
 import './styles.css';
 
-
 const TopBar = () => {
   return (
     <div className="topbar">
@@ -11,7 +10,7 @@ const TopBar = () => {
           <span>App</span>
         </div>
       </div>
-      <div className="menu">
+      {/* <div className="menu">
         <a href="#">Início</a>
         <a href="#">Despesas</a>
         <a href="#" style={{ marginLeft: 'auto' }}>
@@ -21,7 +20,7 @@ const TopBar = () => {
             style={{ width: '20px', verticalAlign: 'middle' }} 
           /> Sair
         </a>
-      </div>
+      </div> */}
     </div>
   );
 };
