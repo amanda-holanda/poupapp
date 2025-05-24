@@ -1,6 +1,6 @@
-# PoupApp
+# 🐖 PoupApp
 
-## Tecnologias utilizadas
+## ⚙️ Tecnologias utilizadas
 
 | Camada         | Tecnologias                       |
 | -------------- | --------------------------------- |
@@ -9,11 +9,11 @@
 | Banco de Dados | Oracle XE (Docker)                |
 | DevOps         | Docker, Maven                     |
 
-### Front-end
+### 🌐 Front-end
 
 Aplicação desenvolvida em [React](https://reactjs.org/) + [Vite](https://vitejs.dev/), com a finalidade de ser um gerenciador de despesas pessoais.
 
-### Back-end
+### 🌐 Back-end
 
 Aplicação desenvolvida em [Java 17](https://docs.oracle.com/en/java/javase/17/), utilizando o [Spring Framework](https://spring.io/), com os seguintes módulos:
 
@@ -27,7 +27,7 @@ Aplicação desenvolvida em [Java 17](https://docs.oracle.com/en/java/javase/17/
 
 ---
 
-## Executar localmente pela primeira vez
+## ▶📋 Executar localmente pela primeira vez
 
 Siga a ordem abaixo para rodar o PoupApp localmente:
 
