@@ -27,7 +27,7 @@ table {
   .actions {
     display: flex;
     gap: 10px;
-    justify-content: center;
+    justify-content: flex-start;
   }
   
   .actions span {

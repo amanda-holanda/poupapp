@@ -1,57 +1,51 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import TopBar from './components/TopBar';
 import Filters from './components/Filters';
 import ExpenseForm from './components/ExpenseForm';
 import ExpenseTable from './components/ExpenseTable';
+import './App.css';
+import api from './services/api';
 import TotalDespesas from './components/TotalDespesas';
 
-
-
-import './App.css';
-
 const App = () => {
-  // Lista completa de categorias
-  const [categories] = useState([
-    'Aluguel/hipoteca',
-    'Assinaturas',
-    'Compras por impulso',
-    'Condomínio',
-    'Contas de água, luz, gás',
-    'Cuidados pessoais',
-    'Educação',
-    'Farmácia/medicamentos',
-    'Financiamentos',
-    'Gastos médicos inesperados',
-    'Hobbies/esportes',
-    'Impostos',
-    'Internet/telefone',
-    'Lazer',
-    'Manutenção de casa/carro',
-    'Mensalidades escolares/faculdade',
-    'Multas',
-    'Outros',
-    'Plano de saúde',
-    'Presentes/doações',
-    'Reparos domésticos',
-    'Restaurantes/bares',
-    'Seguros',
-    'Supermercado/alimentação',
-    'Transporte público/combustível',
-    'Vestuário/calçados',
-    'Viagens'
-  ]);
+const [categories, setCategories] = useState([]);
+const [expenses, setExpenses] = useState([]);
+// Api para fazer get das categorias
+useEffect(() => {
+  api.get('/category/all')
+    .then(res => {
+      if (res.data && Array.isArray(res.data)) {
+        setCategories(res.data);
+      } else {
+        console.error('Resposta da API inesperada:', res.data);
+      }
+    })
+    .catch(err => {
+      console.error('Erro ao buscar categoria:', err);
+    });
+}, []);
+// Api para fazer o get das despesas
+const fetchExpenses = useCallback(() => {
+  api.get('/expense/all')
+    .then(res => {
+      if (res.data) {
+        const enrichedExpenses = res.data.content.map(expense => ({
+          ...expense,
+          category: (categories.find(cat => cat.id === expense.categoryId) || {}).title || null
+        }));
+        setExpenses(enrichedExpenses);
+      } else {
+        console.error('Resposta da API inesperada:', res.data);
+      }
+    })
+    .catch(err => {
+      console.error('Erro ao buscar despesas:', err);
+    });
+}, [categories, setExpenses]);
 
-  // Estado inicial carregando do localStorage
-  const [expenses, setExpenses] = useState(() => {
-    const savedExpenses = localStorage.getItem('poupapp-expenses');
-    return savedExpenses ? JSON.parse(savedExpenses) : [
-      { description: 'Reforma', value: '325,00', category: 'Utilidades Domésticas', date: '21/08/2023' },
-      { description: 'Mercado', value: '300,00', category: 'Alimentação', date: '08/05/2023' },
-      { description: 'Pediatra', value: '300,00', category: 'Saúde', date: '06/09/2023' },
-      { description: 'Faculdade', value: '229,00', category: 'Educação', date: '10/08/2023' },
-      { description: 'Cinema', value: '100,00', category: 'Lazer', date: '30/09/2023' }
-    ];
-  });
+useEffect(() => {
+  fetchExpenses();
+}, [fetchExpenses]);
 
   // Salva no localStorage sempre que expenses mudar
   useEffect(() => {
@@ -77,72 +71,118 @@ const App = () => {
   };
 
   // Filtra e ordena as despesas
-  const filteredExpenses = useMemo(() => {
-    let result = [...expenses];
+const filteredExpenses = useMemo(() => {
+  if (!expenses || expenses.length === 0) return [];
 
-    // Filtro por categoria
-    if (categoryFilter !== 'Todos') {
-      result = result.filter(exp => exp.category === categoryFilter);
-    }
+  let result = [...expenses];
 
-    // Filtro por data única
-    if (dateFilter) {
-      result = result.filter(exp => {
-        const expenseDate = exp.date.split('/').reverse().join('-');
-        return expenseDate === dateFilter;
-      });
-    }
+  
+  // Filtro por categoria - Adicionada validação para comparar category id  do backend com id da categoria escolhida
+  if (categoryFilter && categoryFilter !== 'Todos') {
+    result = result.filter(e => e.categoryId === parseInt(categoryFilter));
+  }
+// Faz o filtro pela data
+  if (dateFilter) {
+    const [day, month, year] = dateFilter.split('/');
+    const targetDate = new Date(`${year}-${month}-${day}`);
 
-    // Ordenação por valor
-    if (sortOrder) {
-      result.sort((a, b) => {
-        const valA = parseFloat(a.value.replace(',', '.'));
-        const valB = parseFloat(b.value.replace(',', '.'));
-        return sortOrder === 'asc' ? valA - valB : valB - valA;
-      });
-    }
+    const isSameDate = (a, b) =>
+      a.getDate() === b.getDate() &&
+      a.getMonth() === b.getMonth() &&
+      a.getFullYear() === b.getFullYear();
 
-    return result;
-  }, [expenses, categoryFilter, sortOrder, dateFilter]);
+    result = result.filter(e => {
+      const [y, m, d] = e.date.split('-').map(Number);
+      const expenseDate = new Date(y, m - 1, d); // mês é 0-based
+      return isSameDate(expenseDate, targetDate);
+    });
+
+  }
+
+  // Ordenação por valor
+  if (sortOrder) {
+    result.sort((a, b) => {
+      const valA = typeof a.valor === 'string' ? parseFloat(a.valor.replace(',', '.')) : a.valor;
+      const valB = typeof b.valor === 'string' ? parseFloat(b.valor.replace(',', '.')) : b.valor;
+      return sortOrder === 'asc' ? valA - valB : valB - valA;
+    });
+  }
+
+  return result;
+}, [expenses, categoryFilter, sortOrder, dateFilter]);
+
 
   // Adiciona nova despesa
-  const handleAddExpense = (newExpense) => {
-    setExpenses(prevExpenses => [...prevExpenses, newExpense]);
+const handleAddExpense = newExpense => {
+// cria um obejto para ser enviado ao backend
+  let { description, value: valor, category: categoryId, date } = newExpense;
+// Trata alguns itens para o envio
+  categoryId = parseInt(categoryId);
+  valor = parseFloat(valor.replace(',', '.'));
+  // envia o objeto ao endpoint de registro
+  api.post('/expense/register', {
+    description,
+    valor,
+    categoryId,
+    date
+  })
+    .then(res => {
+      // se o statu code for == criado então foi criado com sucesso
+      if (res.status === 201) fetchExpenses(); // carrega a lista de despesas novamente
+      else console.error('Erro ao adicionar despesa:', res);
+    })
+    .catch(err => console.error('Erro na requisição de adicionar despesa:', err));
+};
+// Para deletar despesas
+  const handleDeleteExpense = id => {
+    if(id && id !== null){
+      api
+      .delete(`/expense/delete/${id}`)
+      .then(res => {
+        if (res.status === 204) fetchExpenses();
+        else console.error('Erro ao deletar despesa:', res);
+      })
+      .catch(err =>console.error('Erro ao deletar despesa:', err));
+    }
   };
+// Edição de despesas
+  const handleEditExpense = id => {
+    const expenseToEdit = expenses.filter(expense => expense.id == id)[0]; // percorre a lista das despesas para procurar o id da despesa
 
-  const handleDeleteExpense = (index) => {
-    setExpenses(prevExpenses => prevExpenses.filter((_, i) => i !== index));
-  };
-
-  // Edita despesa (implementação básica)
-  const handleEditExpense = (index) => {
-    const expenseToEdit = expenses[index];
-    setEditingIndex(index);
+    setEditingIndex(id); // salva na variável
     setEditFormData({
       description: expenseToEdit.description,
-      value: expenseToEdit.value.replace(',', '.'),
-      category: expenseToEdit.category,
-      date: expenseToEdit.date.split('/').reverse().join('-')
+      value: expenseToEdit.valor,
+      category: expenseToEdit.categoryId,
+      date: expenseToEdit.date
     });
   };
-
+// Atualização para o backend
   const handleUpdateExpense = () => {
-  if (editingIndex !== null) {
-    setExpenses(prevExpenses => {
-      const updated = [...prevExpenses];
-      updated[editingIndex] = {
-        description: editFormData.description,
-        value: parseFloat(editFormData.value).toLocaleString('pt-BR', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        }),
-        category: editFormData.category,
-        date: editFormData.date.split('-').reverse().join('/')
-      };
-      return updated;
-    });
-    setEditingIndex(null);
-  }
+    if (editingIndex !== null){
+      const id = editingIndex;
+
+      let {category:categoryId, date, description, value:valor } = editFormData;
+
+      api.put('/expense/update', 
+        {
+          id,
+          categoryId,
+          date,
+          description,
+          valor
+        })
+        .then(res => {
+          if (res.status === 200){
+            fetchExpenses();
+            setEditingIndex(null);
+          } else console.error('Falha na atualização da despesa:', res);
+        })
+        .catch(err => {
+          console.error('Erro ao atualizar despesa:', err);
+        });
+    }
+
 };
 
   const handleCancelEdit = () => {
@@ -168,7 +208,7 @@ const App = () => {
         <h2>Minhas Despesas</h2>
 
         <Filters
-          categories={['Todos', ...categories]}
+          categories={[{ id: null, title: 'Todos' }, ...categories]}
           onCategoryChange={setCategoryFilter}
           onSortValue={setSortOrder}
           onClearFilters={handleClearFilters}
@@ -202,7 +242,7 @@ const App = () => {
                 onChange={(e) => setEditFormData({ ...editFormData, category: e.target.value })}
               >
                 {categories.map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
+                  <option key={cat.id} value={cat.id}>{cat.title}</option>
                 ))}
               </select>
               <input
@@ -223,7 +263,7 @@ const App = () => {
             onEdit={handleEditExpense}
           />
         )}
-        <TotalDespesas expenses={filteredExpenses} />
+        <TotalDespesas expenses={filteredExpenses}></TotalDespesas>
       </div>
     </div>
   );
